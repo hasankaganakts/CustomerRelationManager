@@ -5,7 +5,7 @@ import CustomerGrowthChart from "@/components/dashboard/customer-growth-chart";
 import TaskStatusChart from "@/components/dashboard/task-status-chart";
 import RecentCustomers from "@/components/dashboard/recent-customers";
 import UpcomingTasks from "@/components/dashboard/upcoming-tasks";
-import { Customer, Task, User } from "@shared/schema";
+import { Customer, Task, User, CustomerStats } from "@shared/schema";
 import { getCurrentMonthCustomers, getTaskStatusCounts } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
@@ -25,11 +25,17 @@ export default function Dashboard() {
     queryKey: ["/api/users"],
   });
 
-  const { data: stats = { totalCustomers: 0, activeCustomers: 0, pendingTasks: 0 }, isLoading: isLoadingStats } = useQuery({
+  type Stats = {
+    totalCustomers: number;
+    activeCustomers: number;
+    pendingTasks: number;
+  };
+
+  const { data: stats = { totalCustomers: 0, activeCustomers: 0, pendingTasks: 0 } as Stats, isLoading: isLoadingStats } = useQuery<Stats>({
     queryKey: ["/api/stats"],
   });
 
-  const { data: customerGrowth = [0, 0, 0, 0, 0, 0], isLoading: isLoadingGrowth } = useQuery({
+  const { data: customerGrowth = [0, 0, 0, 0, 0, 0] as number[], isLoading: isLoadingGrowth } = useQuery<number[]>({
     queryKey: ["/api/stats/customer-growth"],
   });
 
