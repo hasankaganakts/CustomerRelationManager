@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 interface StatsCardProps {
   title: string;
@@ -8,27 +10,40 @@ interface StatsCardProps {
 }
 
 export default function StatsCard({ title, value, icon, color }: StatsCardProps) {
+  // Convert color class (like bg-blue-500) to text color (text-blue-500)
+  const textColor = color.replace("bg-", "text-");
+  
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center">
-          <div className={`flex-shrink-0 ${color} rounded-md p-3`}>
-            {icon}
-          </div>
-          <div className="ml-5 w-0 flex-1">
-            <dl>
-              <dt className="text-sm font-medium text-gray-500 truncate">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow">
+        <div className="px-6 py-6">
+          <div className="flex items-center">
+            <div className={`flex-shrink-0 ${color} bg-opacity-10 rounded-xl p-3 border border-${color.split('-')[1]}-200`}>
+              <div className={textColor}>
+                {icon}
+              </div>
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <div className="text-sm font-medium text-gray-500 mb-1">
                 {title}
-              </dt>
-              <dd>
-                <div className="text-lg font-medium text-gray-900">
+              </div>
+              <div className="flex items-end">
+                <div className="text-2xl font-bold text-gray-900">
                   {value}
                 </div>
-              </dd>
-            </dl>
+                <div className="text-xs font-medium ml-1 mb-1 text-gray-500">
+                  {typeof value === 'number' ? 'toplam' : null}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+        <div className={`h-1 w-full ${color}`}></div>
+      </Card>
+    </motion.div>
   );
 }
