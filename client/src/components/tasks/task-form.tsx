@@ -62,16 +62,23 @@ export default function TaskForm({ onSuccess, task, defaultCustomerId }: TaskFor
   async function onSubmit(values: FormValues) {
     setLoading(true);
     try {
+      // Prepare data for submission
+      const submissionData = {
+        ...values,
+        // Format date as ISO string if it exists
+        dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      };
+      
       if (task) {
         // Update existing task
-        await apiRequest("PATCH", `/api/tasks/${task.id}`, values);
+        await apiRequest("PATCH", `/api/tasks/${task.id}`, submissionData);
         toast({
           title: "Görev güncellendi",
           description: "Görev başarıyla güncellendi.",
         });
       } else {
         // Create new task
-        await apiRequest("POST", "/api/tasks", values);
+        await apiRequest("POST", "/api/tasks", submissionData);
         toast({
           title: "Görev oluşturuldu",
           description: "Görev başarıyla oluşturuldu.",

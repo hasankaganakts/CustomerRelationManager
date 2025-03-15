@@ -389,6 +389,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add the current user as creator
       taskData.createdBy = (req as any).user.id;
       
+      // Handle date conversion for dueDate
+      if (taskData.dueDate) {
+        taskData.dueDate = new Date(taskData.dueDate);
+      }
+      
       const validatedData = insertTaskSchema.parse(taskData);
       const newTask = await storage.createTask(validatedData);
       
@@ -397,6 +402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors });
       }
+      console.error("Task creation error:", error);
       res.status(500).json({ message: "Failed to create task" });
     }
   });
@@ -418,9 +424,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.title) taskData.title = req.body.title;
       if (req.body.description !== undefined) taskData.description = req.body.description;
       if (req.body.status) taskData.status = req.body.status;
-      if (req.body.dueDate) taskData.dueDate = new Date(req.body.dueDate);
-      if (req.body.customerId) taskData.customerId = parseInt(req.body.customerId);
-      if (req.body.assignedTo) taskData.assignedTo = parseInt(req.body.assignedTo);
+      
+      // Handle date correctly - either use the provided date or set to null
+      if (req.body.dueDate) {
+        taskData.dueDate = new Date(req.body.dueDate);
+      } else if (req.body.dueDate === null) {
+        taskData.dueDate = null;
+      }
+      
+      if (req.body.customerId !== undefined) {
+        taskData.customerId = req.body.customerId !== null ? parseInt(req.body.customerId) : null;
+      }
+      
+      if (req.body.assignedTo !== undefined) {
+        taskData.assignedTo = req.body.assignedTo !== null ? parseInt(req.body.assignedTo) : null;
+      }
       
       const updatedTask = await storage.updateTask(id, taskData);
       
@@ -430,6 +448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedTask);
     } catch (error) {
+      console.error("Task update error:", error);
       res.status(500).json({ message: "Failed to update task" });
     }
   });
